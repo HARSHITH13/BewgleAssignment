@@ -1,0 +1,35 @@
+service: bewgleassignment
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+
+  iam:
+    role: arn:aws:iam::469433382165:role/csv_to_dynamodb
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+#package:
+#  patterns:
+#    - '!exclude-me.py'
+#    - '!exclude-me-dir/**'
+#    - include-me.py
+#    - include-me-dir/**
+
+functions:
+  csv_dump_to_dynamodb:
+    handler: handler.csv_dump_to_dynamodb
+    events:
+      - s3:
+          bucket: bewgle-csv-s3-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: data/
+            - suffix: .csv
+          existing: true
